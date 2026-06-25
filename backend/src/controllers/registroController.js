@@ -22,7 +22,13 @@ const criarRegistro = async (req, res, next) => {
   }
 };
 
-module.exports = {
-  listarRegistros,
-  criarRegistro
+const excluirRegistro = async (req, res, next) => {
+  try {
+    const registro = await RegistroMeteorologico
+      .findByIdAndDelete(req.params.id);
+    if (!registro) return res.status(404).json({ erro: 'Registro não encontrado' });
+    res.status(204).end();
+  } catch (error) { next(error); }
 };
+
+module.exports = { listarRegistros, criarRegistro, excluirRegistro };

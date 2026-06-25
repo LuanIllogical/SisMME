@@ -1,0 +1,124 @@
+<div class="page-header">
+  <div>
+    <h2>Novo registro meteorológico</h2>
+    <p class="text-muted">Registre dados de medição em um ponto monitorado</p>
+  </div>
+  <a routerLink="/registros" class="btn btn-sm">← Voltar</a>
+</div>
+
+<div class="page-body">
+  <div class="form-card card">
+
+    <div class="alert alert-error" *ngIf="erro">⚠️ {{ erro }}</div>
+
+    <form #regForm="ngForm" (ngSubmit)="salvar(regForm)">
+
+      <!-- Local e data/hora -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="local">Local *</label>
+          <select
+            id="local"
+            name="local"
+            [(ngModel)]="registro.local"
+            required
+            #localCtrl="ngModel"
+          >
+            <option value="">Selecione o local de medição</option>
+            <option *ngFor="let l of locais" [value]="l._id">
+              {{ l.nome }}{{ l.descricao ? ' — ' + l.descricao : '' }}
+            </option>
+          </select>
+          <div class="field-error" *ngIf="localCtrl.invalid && localCtrl.touched">
+            Selecione um local.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="dataHora">Data e hora da medição</label>
+          <input
+            id="dataHora"
+            name="dataHora"
+            type="datetime-local"
+            [(ngModel)]="registro.dataHora"
+          />
+        </div>
+      </div>
+
+      <!-- Temperatura e umidade -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="temperatura">Temperatura (°C) *</label>
+          <input
+            id="temperatura"
+            name="temperatura"
+            type="number"
+            step="0.1"
+            [(ngModel)]="registro.temperatura"
+            placeholder="ex: 23.5"
+            required
+            #temp="ngModel"
+          />
+          <div class="field-error" *ngIf="temp.invalid && temp.touched">
+            Informe a temperatura.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="umidade">Umidade relativa (%) *</label>
+          <input
+            id="umidade"
+            name="umidade"
+            type="number"
+            min="0"
+            max="100"
+            [(ngModel)]="registro.umidade"
+            placeholder="ex: 72"
+            required
+            #umid="ngModel"
+          />
+          <div class="field-error" *ngIf="umid.invalid && umid.touched">
+            Informe a umidade (0–100).
+          </div>
+        </div>
+      </div>
+
+      <!-- Vento e precipitação -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="vento">Velocidade do vento (km/h)</label>
+          <input
+            id="vento"
+            name="velocidadeVento"
+            type="number"
+            min="0"
+            step="0.5"
+            [(ngModel)]="registro.velocidadeVento"
+            placeholder="ex: 15"
+          />
+        </div>
+        <div class="form-group">
+          <label for="precipitacao">Precipitação acumulada (mm)</label>
+          <input
+            id="precipitacao"
+            name="precipitacao"
+            type="number"
+            min="0"
+            step="0.1"
+            [(ngModel)]="registro.precipitacao"
+            placeholder="ex: 2.5"
+          />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="salvando">
+          <span *ngIf="salvando" class="spinner"></span>
+          {{ salvando ? 'Salvando...' : '💾 Salvar registro' }}
+        </button>
+        <button type="button" class="btn" (click)="limpar(regForm)">
+          Limpar
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

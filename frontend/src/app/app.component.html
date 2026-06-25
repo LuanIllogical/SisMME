@@ -1,2 +1,45 @@
-<h1>SisMME</h1>
-<p>Sistema de Monitoramento Meteorológico para Engenharia</p>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">⛈</span>
+      <div>
+        <h1>SisMME</h1>
+        <p>Monitoramento Meteorológico</p>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">📊</span>
+        Painel
+      </a>
+      <a routerLink="/locais" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">📍</span>
+        Locais
+      </a>
+      <a routerLink="/registros" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">📋</span>
+        Registros
+      </a>
+
+      <div class="nav-divider"></div>
+
+      <a routerLink="/registros/novo" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">➕</span>
+        Novo registro
+      </a>
+      <a routerLink="/locais/novo" routerLinkActive="active" class="nav-item">
+        <span class="nav-icon">🗺</span>
+        Cadastrar local
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="text-muted text-sm">v1.0 MVP</span>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

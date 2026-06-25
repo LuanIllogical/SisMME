@@ -1,0 +1,117 @@
+<div class="page-header">
+  <div>
+    <h2>Painel de indicadores</h2>
+    <p class="text-muted">Resumo dos dados meteorológicos coletados</p>
+  </div>
+  <button class="btn btn-sm" (click)="carregar()">
+    <span *ngIf="carregando" class="spinner"></span>
+    Atualizar
+  </button>
+</div>
+
+<div class="page-body">
+
+  <!-- Alerta de erro -->
+  <div class="alert alert-error" *ngIf="erro">
+    ⚠️ {{ erro }}
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="carregando && !erro">
+    <div class="spinner"></div>
+    <span>Carregando dados...</span>
+  </div>
+
+  <ng-container *ngIf="!carregando">
+
+    <!-- Métricas -->
+    <div class="metrics-grid">
+      <div class="metric-card teal">
+        <div class="metric-label">Temp. média</div>
+        <div class="metric-value">{{ metricas.tempMedia }}°C</div>
+        <div class="metric-sub">Mín {{ metricas.tempMin }}° / Máx {{ metricas.tempMax }}°</div>
+      </div>
+      <div class="metric-card blue">
+        <div class="metric-label">Umidade média</div>
+        <div class="metric-value">{{ metricas.umidadeMedia }}%</div>
+        <div class="metric-sub">{{ registros.length }} medições</div>
+      </div>
+      <div class="metric-card amber">
+        <div class="metric-label">Precipitação total</div>
+        <div class="metric-value">{{ metricas.precipTotal }} mm</div>
+        <div class="metric-sub">{{ metricas.eventosPrec }} eventos</div>
+      </div>
+      <div class="metric-card coral">
+        <div class="metric-label">Locais ativos</div>
+        <div class="metric-value">{{ metricas.locaisAtivos }}</div>
+        <div class="metric-sub">de {{ metricas.totalLocais }} cadastrados</div>
+      </div>
+    </div>
+
+    <!-- Gráfico de temperatura -->
+    <div class="card mb-6" *ngIf="registros.length > 0">
+      <div class="card-title-row">
+        <span class="card-title">Temperatura por medição</span>
+        <span class="text-muted text-sm">{{ registros.length }} pontos</span>
+      </div>
+      <div class="bar-chart">
+        <div
+          class="bar"
+          *ngFor="let r of registros"
+          [style.height.px]="calcBarHeight(r.temperatura)"
+          [title]="nomeLocal(r.local) + ' — ' + r.temperatura + '°C'"
+          [class.bar-cold]="r.temperatura < 18"
+          [class.bar-hot]="r.temperatura > 28">
+        </div>
+      </div>
+      <div class="bar-labels">
+        <span class="bar-label" *ngFor="let r of registros">{{ r.temperatura }}°</span>
+      </div>
+    </div>
+
+    <!-- Tabela de registros recentes -->
+    <div class="card">
+      <div class="card-title-row mb-4">
+        <span class="card-title">Registros recentes</span>
+        <a routerLink="/registros" class="btn btn-sm">Ver todos</a>
+      </div>
+
+      <div class="empty-state" *ngIf="registros.length === 0">
+        <div class="empty-icon">📋</div>
+        <p>Nenhum registro encontrado.</p>
+        <a routerLink="/registros/novo" class="btn btn-primary btn-sm">Criar primeiro registro</a>
+      </div>
+
+      <div class="table-wrap" *ngIf="registros.length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>Local</th>
+              <th>Data/hora</th>
+              <th>Temp.</th>
+              <th>Umidade</th>
+              <th>Precipitação</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of registrosRecentes">
+              <td class="font-medium">{{ nomeLocal(r.local) }}</td>
+              <td class="text-muted">{{ r.dataHora | date:'dd/MM/yy HH:mm' }}</td>
+              <td>
+                <span [ngClass]="classeTemp(r.temperatura)">{{ r.temperatura }}°C</span>
+              </td>
+              <td>{{ r.umidade }}%</td>
+              <td>
+                <span *ngIf="r.precipitacao && r.precipitacao > 0" style="color: var(--color-amber); font-weight: 500">
+                  {{ r.precipitacao }} mm
+                </span>
+                <span *ngIf="!r.precipitacao || r.precipitacao === 0" class="text-muted">—</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </ng-container>
+</div>

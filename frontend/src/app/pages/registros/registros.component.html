@@ -1,0 +1,113 @@
+<div class="page-header">
+  <div>
+    <h2>Registros meteorológicos</h2>
+    <p class="text-muted">{{ registros.length }} resultado{{ registros.length !== 1 ? 's' : '' }}</p>
+  </div>
+  <a routerLink="/registros/novo" class="btn btn-primary">+ Novo registro</a>
+</div>
+
+<div class="page-body">
+
+  <div class="alert alert-success" *ngIf="mensagem">✅ {{ mensagem }}</div>
+  <div class="alert alert-error"   *ngIf="erro">⚠️ {{ erro }}</div>
+
+  <!-- Filtros -->
+  <div class="filter-panel card mb-4">
+    <div class="filter-grid">
+      <div class="form-group">
+        <label>Local</label>
+        <select [(ngModel)]="filtros.localId" (ngModelChange)="aplicarFiltros()">
+          <option value="">Todos os locais</option>
+          <option *ngFor="let l of locais" [value]="l._id">{{ l.nome }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Data inicial</label>
+        <input type="date" [(ngModel)]="filtros.dataInicio" (ngModelChange)="aplicarFiltros()" />
+      </div>
+      <div class="form-group">
+        <label>Data final</label>
+        <input type="date" [(ngModel)]="filtros.dataFim" (ngModelChange)="aplicarFiltros()" />
+      </div>
+      <div class="form-group">
+        <label>Temp. mín (°C)</label>
+        <input type="number" [(ngModel)]="filtros.tempMin" (ngModelChange)="aplicarFiltros()" placeholder="—" />
+      </div>
+      <div class="form-group">
+        <label>Temp. máx (°C)</label>
+        <input type="number" [(ngModel)]="filtros.tempMax" (ngModelChange)="aplicarFiltros()" placeholder="—" />
+      </div>
+      <div class="form-group filter-clear">
+        <button class="btn btn-sm" (click)="limparFiltros()" *ngIf="temFiltroAtivo">
+          ✕ Limpar filtros
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="carregando">
+    <div class="spinner"></div>
+    <span>Carregando registros...</span>
+  </div>
+
+  <!-- Tabela -->
+  <ng-container *ngIf="!carregando">
+
+    <div class="empty-state" *ngIf="registros.length === 0">
+      <div class="empty-icon">📋</div>
+      <p *ngIf="!temFiltroAtivo">Nenhum registro encontrado.</p>
+      <p *ngIf="temFiltroAtivo">Nenhum registro encontrado para esses filtros.</p>
+      <a routerLink="/registros/novo" class="btn btn-primary btn-sm" *ngIf="!temFiltroAtivo">
+        Criar primeiro registro
+      </a>
+      <button class="btn btn-sm" (click)="limparFiltros()" *ngIf="temFiltroAtivo">
+        Limpar filtros
+      </button>
+    </div>
+
+    <div class="table-wrap" *ngIf="registros.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th>Local</th>
+            <th>Data/hora</th>
+            <th>Temp.</th>
+            <th>Umidade</th>
+            <th>Vento</th>
+            <th>Precipitação</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of registros">
+            <td class="font-medium">{{ nomeLocal(r.local) }}</td>
+            <td class="text-muted" style="white-space:nowrap">
+              {{ r.dataHora | date:'dd/MM/yy HH:mm' }}
+            </td>
+            <td>
+              <span [ngClass]="classeTemp(r.temperatura)">{{ r.temperatura }}°C</span>
+            </td>
+            <td>{{ r.umidade }}%</td>
+            <td>
+              <span *ngIf="r.velocidadeVento != null">{{ r.velocidadeVento }} km/h</span>
+              <span *ngIf="r.velocidadeVento == null" class="text-muted">—</span>
+            </td>
+            <td>
+              <span *ngIf="r.precipitacao && r.precipitacao > 0" style="color:var(--color-amber);font-weight:500">
+                {{ r.precipitacao }} mm
+              </span>
+              <span *ngIf="!r.precipitacao || r.precipitacao === 0" class="text-muted">—</span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-danger" (click)="excluir(r)" title="Excluir registro">
+                🗑
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </ng-container>
+</div>

@@ -1,0 +1,61 @@
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  gap: 1rem;
+}
+.page-header h2 { font-size: 18px; font-weight: 600; }
+.page-body { padding: 1.5rem; }
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  padding: 2rem 0;
+}
+
+.card-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.card-title { font-size: 14px; font-weight: 600; }
+
+/* Bar chart */
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 70px;
+  margin-top: 1rem;
+}
+.bar {
+  flex: 1;
+  background: var(--color-primary);
+  border-radius: 3px 3px 0 0;
+  opacity: .75;
+  cursor: default;
+  transition: opacity .15s;
+  min-width: 10px;
+}
+.bar:hover { opacity: 1; }
+.bar.bar-cold { background: var(--color-blue); }
+.bar.bar-hot  { background: var(--color-danger); }
+
+.bar-labels {
+  display: flex;
+  gap: 5px;
+  margin-top: 4px;
+}
+.bar-label {
+  flex: 1;
+  font-size: 10px;
+  color: var(--color-text-muted);
+  text-align: center;
+  min-width: 10px;
+}

@@ -1,0 +1,95 @@
+<div class="page-header">
+  <div>
+    <h2>Cadastrar local</h2>
+    <p class="text-muted">Adicione um novo ponto de monitoramento meteorológico</p>
+  </div>
+  <a routerLink="/locais" class="btn btn-sm">← Voltar</a>
+</div>
+
+<div class="page-body">
+  <div class="form-card card">
+
+    <div class="alert alert-error" *ngIf="erro">⚠️ {{ erro }}</div>
+
+    <form #localForm="ngForm" (ngSubmit)="salvar(localForm)">
+
+      <div class="form-group">
+        <label for="nome">Nome do local *</label>
+        <input
+          id="nome"
+          name="nome"
+          type="text"
+          [(ngModel)]="local.nome"
+          placeholder="ex: Estação Parque Industrial"
+          required
+          #nome="ngModel"
+        />
+        <div class="field-error" *ngIf="nome.invalid && nome.touched">
+          O nome do local é obrigatório.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="descricao">Descrição</label>
+        <input
+          id="descricao"
+          name="descricao"
+          type="text"
+          [(ngModel)]="local.descricao"
+          placeholder="Localização, características, finalidade do ponto"
+        />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="latitude">Latitude *</label>
+          <input
+            id="latitude"
+            name="latitude"
+            type="number"
+            step="0.0001"
+            [(ngModel)]="local.latitude"
+            placeholder="ex: -24.9578"
+            required
+            #lat="ngModel"
+          />
+          <div class="field-error" *ngIf="lat.invalid && lat.touched">
+            Informe a latitude.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="longitude">Longitude *</label>
+          <input
+            id="longitude"
+            name="longitude"
+            type="number"
+            step="0.0001"
+            [(ngModel)]="local.longitude"
+            placeholder="ex: -53.4595"
+            required
+            #lng="ngModel"
+          />
+          <div class="field-error" *ngIf="lng.invalid && lng.touched">
+            Informe a longitude.
+          </div>
+        </div>
+      </div>
+
+      <div class="hint">
+        ℹ️ Use coordenadas decimais (ex: -24.9578, -53.4595).
+        Para a região de Cascavel/PR: Lat ≈ -24.9 / Lon ≈ -53.4.
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="salvando">
+          <span *ngIf="salvando" class="spinner"></span>
+          {{ salvando ? 'Salvando...' : '💾 Cadastrar local' }}
+        </button>
+        <button type="button" class="btn" (click)="limpar(localForm)">
+          Limpar
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
