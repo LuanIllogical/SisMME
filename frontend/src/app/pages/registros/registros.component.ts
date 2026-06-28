@@ -6,6 +6,7 @@ import { LocalService } from '../../services/local.service';
 import { FiltrosRegistro, RegistroService } from '../../services/registro.service';
 
 @Component({
+  standalone: false,
   selector: 'app-registros',
   templateUrl: './registros.component.html',
   styleUrls: ['./registros.component.css']

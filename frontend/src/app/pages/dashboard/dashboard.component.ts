@@ -6,6 +6,7 @@ import { LocalService } from '../../services/local.service';
 import { RegistroService } from '../../services/registro.service';
 
 @Component({
+  standalone: false,
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']

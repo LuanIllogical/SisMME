@@ -3,6 +3,7 @@ import { Local } from '../../models/local.model';
 import { LocalService } from '../../services/local.service';
 
 @Component({
+  standalone: false,
   selector: 'app-locais',
   templateUrl: './locais.component.html',
   styleUrls: ['./locais.component.css']

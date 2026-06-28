@@ -3,8 +3,8 @@ const { criarLocal, listarLocais, alterarStatus } = require('../controllers/loca
 
 const router = express.Router();
 
-router.get('/', listarLocais);
-router.post('/', criarLocal);
-router.patch('/:id',   alterarStatus); 
+router.get('/',      listarLocais);
+router.post('/',     criarLocal);
+router.patch('/:id', alterarStatus);
 
 module.exports = router;

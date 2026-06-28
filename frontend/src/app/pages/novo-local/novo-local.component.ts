@@ -5,6 +5,7 @@ import { Local } from '../../models/local.model';
 import { LocalService } from '../../services/local.service';
 
 @Component({
+  standalone: false,
   selector: 'app-novo-local',
   templateUrl: './novo-local.component.html',
   styleUrls: ['./novo-local.component.css']
