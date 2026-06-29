@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Local } from '../../models/local.model';
 import { RegistroMeteorologico } from '../../models/registro-meteorologico.model';
-import { LocalService } from '../../services/local.service';
-import { FiltrosRegistro, RegistroService } from '../../services/registro.service';
+import { LocalService } from '../../../services/local.service';
+import { FiltrosRegistro, RegistroService } from '../../../services/registro.service';
 
 @Component({
   standalone: false,
@@ -23,19 +23,23 @@ export class RegistrosComponent implements OnInit {
   constructor(
     private registroService: RegistroService,
     private localService: LocalService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    // Captura mensagem de sucesso vinda de outro componente
-    const nav = this.router.getCurrentNavigation();
-    const state = nav?.extras?.state as { mensagem?: string } | undefined;
+    // Captura mensagem via history.state (compatível com navegação Angular)
+    const state = history.state as { mensagem?: string };
     if (state?.mensagem) {
       this.mensagem = state.mensagem;
       setTimeout(() => this.mensagem = '', 4000);
     }
 
-    this.localService.listar().subscribe(locais => this.locais = locais);
+    this.localService.listar().subscribe({
+      next: locais => this.locais = locais,
+      error: () => {}
+    });
+
     this.aplicarFiltros();
   }
 

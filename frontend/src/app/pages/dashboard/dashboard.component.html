@@ -3,28 +3,22 @@
     <h2>Painel de indicadores</h2>
     <p class="text-muted">Resumo dos dados meteorológicos coletados</p>
   </div>
-  <button class="btn btn-sm" (click)="carregar()">
-    <span *ngIf="carregando" class="spinner"></span>
-    Atualizar
-  </button>
+  <button class="btn btn-sm" (click)="carregar()" [disabled]="carregando">Atualizar</button>
 </div>
 
 <div class="page-body">
 
-  <!-- Alerta de erro -->
   <div class="alert alert-error" *ngIf="erro">
     ⚠️ {{ erro }}
   </div>
 
-  <!-- Loading -->
   <div class="loading-state" *ngIf="carregando && !erro">
     <div class="spinner"></div>
     <span>Carregando dados...</span>
   </div>
 
-  <ng-container *ngIf="!carregando">
+  <ng-container *ngIf="!carregando && !erro">
 
-    <!-- Métricas -->
     <div class="metrics-grid">
       <div class="metric-card teal">
         <div class="metric-label">Temp. média</div>
@@ -48,7 +42,6 @@
       </div>
     </div>
 
-    <!-- Gráfico de temperatura -->
     <div class="card mb-6" *ngIf="registros.length > 0">
       <div class="card-title-row">
         <span class="card-title">Temperatura por medição</span>
@@ -69,7 +62,6 @@
       </div>
     </div>
 
-    <!-- Tabela de registros recentes -->
     <div class="card">
       <div class="card-title-row mb-4">
         <span class="card-title">Registros recentes</span>
@@ -78,7 +70,7 @@
 
       <div class="empty-state" *ngIf="registros.length === 0">
         <div class="empty-icon">📋</div>
-        <p>Nenhum registro encontrado.</p>
+        <p>Nenhum registro ainda.</p>
         <a routerLink="/registros/novo" class="btn btn-primary btn-sm">Criar primeiro registro</a>
       </div>
 
@@ -86,25 +78,17 @@
         <table>
           <thead>
             <tr>
-              <th>Local</th>
-              <th>Data/hora</th>
-              <th>Temp.</th>
-              <th>Umidade</th>
-              <th>Precipitação</th>
+              <th>Local</th><th>Data/hora</th><th>Temp.</th><th>Umidade</th><th>Precipitação</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let r of registrosRecentes">
               <td class="font-medium">{{ nomeLocal(r.local) }}</td>
               <td class="text-muted">{{ r.dataHora | date:'dd/MM/yy HH:mm' }}</td>
-              <td>
-                <span [ngClass]="classeTemp(r.temperatura)">{{ r.temperatura }}°C</span>
-              </td>
+              <td><span [ngClass]="classeTemp(r.temperatura)">{{ r.temperatura }}°C</span></td>
               <td>{{ r.umidade }}%</td>
               <td>
-                <span *ngIf="r.precipitacao && r.precipitacao > 0" style="color: var(--color-amber); font-weight: 500">
-                  {{ r.precipitacao }} mm
-                </span>
+                <span *ngIf="r.precipitacao && r.precipitacao > 0" style="color:var(--color-amber);font-weight:500">{{ r.precipitacao }} mm</span>
                 <span *ngIf="!r.precipitacao || r.precipitacao === 0" class="text-muted">—</span>
               </td>
             </tr>
@@ -114,4 +98,14 @@
     </div>
 
   </ng-container>
+
+  <!-- Estado vazio sem erro (banco zerado) -->
+  <ng-container *ngIf="!carregando && !erro && registros.length === 0 && locais.length === 0">
+    <div class="empty-state" style="margin-top:2rem">
+      <div class="empty-icon">🌦</div>
+      <p>Nenhum dado ainda. Comece cadastrando um local.</p>
+      <a routerLink="/locais/novo" class="btn btn-primary btn-sm">Cadastrar local</a>
+    </div>
+  </ng-container>
+
 </div>

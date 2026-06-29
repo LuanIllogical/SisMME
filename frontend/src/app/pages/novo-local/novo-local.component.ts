@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Local } from '../../models/local.model';
-import { LocalService } from '../../services/local.service';
+import { LocalService } from '../../../services/local.service';
 
 @Component({
   standalone: false,
@@ -10,15 +10,18 @@ import { LocalService } from '../../services/local.service';
   templateUrl: './novo-local.component.html',
   styleUrls: ['./novo-local.component.css']
 })
-export class NovoLocalComponent {
+export class NovoLocalComponent implements OnInit {
   local: Partial<Local> = { ativo: true };
   salvando = false;
   erro = '';
+  erroDetalhe = '';
 
   constructor(
     private localService: LocalService,
     private router: Router
   ) {}
+
+  ngOnInit(): void {}
 
   salvar(form: NgForm): void {
     if (form.invalid) {
@@ -26,17 +29,34 @@ export class NovoLocalComponent {
       return;
     }
 
+    // Cast explícito: inputs HTML sempre retornam string, Mongoose exige Number
+    const payload: Local = {
+      nome:      String(this.local.nome ?? '').trim(),
+      descricao: this.local.descricao ? String(this.local.descricao).trim() : undefined,
+      latitude:  Number(this.local.latitude),
+      longitude: Number(this.local.longitude),
+      ativo:     true
+    };
+
+    if (isNaN(payload.latitude) || isNaN(payload.longitude)) {
+      this.erro = 'Latitude e longitude precisam ser números válidos.';
+      return;
+    }
+
     this.salvando = true;
     this.erro = '';
+    this.erroDetalhe = '';
 
-    this.localService.criar(this.local as Local).subscribe({
+    this.localService.criar(payload).subscribe({
       next: () => {
         this.router.navigate(['/locais'], {
-          state: { mensagem: `Local "${this.local.nome}" cadastrado com sucesso.` }
+          state: { mensagem: `Local "${payload.nome}" cadastrado com sucesso.` }
         });
       },
-      error: () => {
-        this.erro = 'Erro ao cadastrar o local. Verifique os dados e tente novamente.';
+      error: (err) => {
+        const msg = err?.error?.message ?? err?.message ?? '';
+        this.erro = 'Erro ao cadastrar o local.';
+        this.erroDetalhe = msg;
         this.salvando = false;
       }
     });
@@ -46,5 +66,6 @@ export class NovoLocalComponent {
     form.resetForm();
     this.local = { ativo: true };
     this.erro = '';
+    this.erroDetalhe = '';
   }
 }

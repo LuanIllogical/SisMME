@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { forkJoin } from 'rxjs';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Local } from '../../models/local.model';
 import { RegistroMeteorologico } from '../../models/registro-meteorologico.model';
-import { LocalService } from '../../services/local.service';
-import { RegistroService } from '../../services/registro.service';
+import { LocalService } from '../../../services/local.service';
+import { RegistroService } from '../../../services/registro.service';
 
 @Component({
   standalone: false,
@@ -24,9 +23,13 @@ export class DashboardComponent implements OnInit {
     locaisAtivos: 0, totalLocais: 0
   };
 
+  private locaisCarregados = false;
+  private registrosCarregados = false;
+
   constructor(
     private localService: LocalService,
-    private registroService: RegistroService
+    private registroService: RegistroService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -36,38 +39,65 @@ export class DashboardComponent implements OnInit {
   carregar(): void {
     this.carregando = true;
     this.erro = '';
+    this.locaisCarregados = false;
+    this.registrosCarregados = false;
 
-    forkJoin({
-      locais: this.localService.listar(),
-      registros: this.registroService.listar()
-    }).subscribe({
-      next: ({ locais, registros }) => {
+    this.localService.listar().subscribe({
+      next: locais => {
         this.locais = locais;
-        this.registros = registros;
-        this.calcularMetricas();
-        this.carregando = false;
+        this.locaisCarregados = true;
+        this.tentarFinalizar();
       },
       error: () => {
-        this.erro = 'Não foi possível carregar os dados. Verifique se o servidor está em execução.';
-        this.carregando = false;
+        this.locais = [];
+        this.locaisCarregados = true;
+        this.tentarFinalizar();
       }
     });
+
+    this.registroService.listar().subscribe({
+      next: registros => {
+        this.registros = registros;
+        this.registrosCarregados = true;
+        this.tentarFinalizar();
+      },
+      error: () => {
+        this.registros = [];
+        this.registrosCarregados = true;
+        this.tentarFinalizar();
+      }
+    });
+  }
+
+  private tentarFinalizar(): void {
+    if (!this.locaisCarregados || !this.registrosCarregados) return;
+    this.calcularMetricas();
+    this.carregando = false;
+    this.cdr.detectChanges();
   }
 
   private calcularMetricas(): void {
     const regs = this.registros;
     const n = regs.length;
 
-    if (n === 0) return;
+    if (n === 0) {
+      this.metricas = {
+        tempMedia: 0, tempMin: 0, tempMax: 0, umidadeMedia: 0,
+        precipTotal: 0, eventosPrec: 0,
+        locaisAtivos: this.locais.filter(l => l.ativo).length,
+        totalLocais: this.locais.length
+      };
+      return;
+    }
 
     const temps = regs.map(r => r.temperatura);
     const umids = regs.map(r => r.umidade);
     const precs = regs.filter(r => (r.precipitacao ?? 0) > 0);
 
     this.metricas = {
-      tempMedia: +( temps.reduce((a, b) => a + b, 0) / n ).toFixed(1),
-      tempMin:   +Math.min(...temps).toFixed(1),
-      tempMax:   +Math.max(...temps).toFixed(1),
+      tempMedia:    +( temps.reduce((a, b) => a + b, 0) / n ).toFixed(1),
+      tempMin:      +Math.min(...temps).toFixed(1),
+      tempMax:      +Math.max(...temps).toFixed(1),
       umidadeMedia: +( umids.reduce((a, b) => a + b, 0) / n ).toFixed(0),
       precipTotal:  +( precs.reduce((s, r) => s + (r.precipitacao ?? 0), 0) ).toFixed(1),
       eventosPrec:  precs.length,
@@ -85,8 +115,7 @@ export class DashboardComponent implements OnInit {
   nomeLocal(localRef: string | Local | undefined): string {
     if (!localRef) return '—';
     if (typeof localRef === 'object') return localRef.nome;
-    const local = this.locais.find(l => l._id === localRef);
-    return local?.nome ?? localRef;
+    return this.locais.find(l => l._id === localRef)?.nome ?? localRef;
   }
 
   classeTemp(temp: number): string {
@@ -97,6 +126,7 @@ export class DashboardComponent implements OnInit {
 
   calcBarHeight(temp: number): number {
     const temps = this.registros.map(r => r.temperatura);
+    if (temps.length === 0) return 10;
     const min = Math.min(...temps);
     const max = Math.max(...temps);
     const range = max - min || 1;

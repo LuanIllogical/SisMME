@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-
+import { AppRoutingModule }      from './app-routing.module';
+import { AppComponent }          from './app.component';
 import { DashboardComponent }    from './pages/dashboard/dashboard.component';
 import { LocaisComponent }       from './pages/locais/locais.component';
 import { NovoLocalComponent }    from './pages/novo-local/novo-local.component';
@@ -23,6 +23,7 @@ import { NovoRegistroComponent } from './pages/novo-registro/novo-registro.compo
   ],
   imports: [
     BrowserModule,
+    CommonModule,
     HttpClientModule,
     FormsModule,
     AppRoutingModule,

@@ -9,20 +9,20 @@
 <div class="page-body">
   <div class="form-card card">
 
-    <div class="alert alert-error" *ngIf="erro">⚠️ {{ erro }}</div>
+    <div class="alert alert-error" *ngIf="erro">
+      ⚠️ {{ erro }}
+      <span *ngIf="erroDetalhe" style="display:block;font-size:11px;margin-top:4px;opacity:.8">{{ erroDetalhe }}</span>
+    </div>
 
     <form #localForm="ngForm" (ngSubmit)="salvar(localForm)">
 
       <div class="form-group">
         <label for="nome">Nome do local *</label>
         <input
-          id="nome"
-          name="nome"
-          type="text"
+          id="nome" name="nome" type="text"
           [(ngModel)]="local.nome"
           placeholder="ex: Estação Parque Industrial"
-          required
-          #nome="ngModel"
+          required #nome="ngModel"
         />
         <div class="field-error" *ngIf="nome.invalid && nome.touched">
           O nome do local é obrigatório.
@@ -32,9 +32,7 @@
       <div class="form-group">
         <label for="descricao">Descrição</label>
         <input
-          id="descricao"
-          name="descricao"
-          type="text"
+          id="descricao" name="descricao" type="text"
           [(ngModel)]="local.descricao"
           placeholder="Localização, características, finalidade do ponto"
         />
@@ -44,40 +42,33 @@
         <div class="form-group">
           <label for="latitude">Latitude *</label>
           <input
-            id="latitude"
-            name="latitude"
-            type="number"
-            step="0.0001"
+            id="latitude" name="latitude" type="number"
+            step="0.0001" min="-90" max="90"
             [(ngModel)]="local.latitude"
             placeholder="ex: -24.9578"
-            required
-            #lat="ngModel"
+            required #lat="ngModel"
           />
           <div class="field-error" *ngIf="lat.invalid && lat.touched">
-            Informe a latitude.
+            Informe a latitude (entre -90 e 90).
           </div>
         </div>
         <div class="form-group">
           <label for="longitude">Longitude *</label>
           <input
-            id="longitude"
-            name="longitude"
-            type="number"
-            step="0.0001"
+            id="longitude" name="longitude" type="number"
+            step="0.0001" min="-180" max="180"
             [(ngModel)]="local.longitude"
             placeholder="ex: -53.4595"
-            required
-            #lng="ngModel"
+            required #lng="ngModel"
           />
           <div class="field-error" *ngIf="lng.invalid && lng.touched">
-            Informe a longitude.
+            Informe a longitude (entre -180 e 180).
           </div>
         </div>
       </div>
 
       <div class="hint">
-        ℹ️ Use coordenadas decimais (ex: -24.9578, -53.4595).
-        Para a região de Cascavel/PR: Lat ≈ -24.9 / Lon ≈ -53.4.
+        ℹ️ Coordenadas decimais — Cascavel/PR: Lat ≈ -24.9 / Lon ≈ -53.4
       </div>
 
       <div class="form-actions">
