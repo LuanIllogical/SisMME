@@ -13,7 +13,7 @@ export interface FiltrosRegistro {
 
 @Injectable({ providedIn: 'root' })
 export class RegistroService {
-  private readonly apiUrl = '/api/locais';
+  private readonly apiUrl = '/api/registros';
 
   constructor(private readonly http: HttpClient) {}
 

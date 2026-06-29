@@ -53,7 +53,7 @@ export class NovoRegistroComponent implements OnInit {
         console.log('✅ Locais carregados:', locais);
         this.locais = locais;
         
-        if (locais.length === 1) {
+        if (locais.length > 0) {
           this.registro.local = locais[0]._id;
         }
       },
@@ -159,7 +159,7 @@ export class NovoRegistroComponent implements OnInit {
     this.erro = '';
     this.erroDetalhe = '';
     
-    if (this.locais.length === 1) {
+    if (this.locais.length > 0) {
       this.registro.local = this.locais[0]._id;
     }
   }
