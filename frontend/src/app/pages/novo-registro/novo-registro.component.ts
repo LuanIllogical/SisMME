@@ -1,12 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Local } from '../../models/local.model';
-import { RegistroMeteorologico } from '../../models/registro-meteorologico.model';
 import { LocalService } from '../../../services/local.service';
 import { RegistroService } from '../../../services/registro.service';
 
-// Interface para o payload com propriedades opcionais
 interface RegistroPayload {
   local: string;
   dataHora: string;
@@ -32,6 +30,7 @@ export class NovoRegistroComponent implements OnInit {
     velocidadeVento: null,
     precipitacao: null
   };
+  carregandoLocais = true;
   salvando = false;
   erro = '';
   erroDetalhe = '';
@@ -39,28 +38,27 @@ export class NovoRegistroComponent implements OnInit {
   constructor(
     private localService: LocalService,
     private registroService: RegistroService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.carregarLocais();
     this.definirDataHoraAtual();
+    this.carregarLocais();
   }
 
   carregarLocais(): void {
     this.localService.listar(true).subscribe({
       next: (locais) => {
-        console.log('✅ Locais carregados:', locais);
         this.locais = locais;
-        
-        if (locais.length > 0) {
-          this.registro.local = locais[0]._id;
-        }
+        this.carregandoLocais = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('❌ Erro ao carregar locais:', err);
         this.erro = 'Não foi possível carregar os locais.';
         this.erroDetalhe = err.message || 'Erro desconhecido';
+        this.carregandoLocais = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -83,7 +81,6 @@ export class NovoRegistroComponent implements OnInit {
       return;
     }
 
-    // Criar payload com tipagem correta
     const payload: RegistroPayload = {
       local: this.registro.local,
       dataHora: this.registro.dataHora,
@@ -91,56 +88,40 @@ export class NovoRegistroComponent implements OnInit {
       umidade: Number(this.registro.umidade)
     };
 
-    // Adicionar campos opcionais com verificação
-    if (this.registro.velocidadeVento !== null && 
-        this.registro.velocidadeVento !== '' && 
+    if (this.registro.velocidadeVento !== null &&
+        this.registro.velocidadeVento !== '' &&
         this.registro.velocidadeVento !== undefined) {
       payload.velocidadeVento = Number(this.registro.velocidadeVento);
     }
 
-    if (this.registro.precipitacao !== null && 
-        this.registro.precipitacao !== '' && 
+    if (this.registro.precipitacao !== null &&
+        this.registro.precipitacao !== '' &&
         this.registro.precipitacao !== undefined) {
       payload.precipitacao = Number(this.registro.precipitacao);
     }
-
-    console.log('📤 Payload sendo enviado:', JSON.stringify(payload, null, 2));
 
     this.salvando = true;
     this.erro = '';
     this.erroDetalhe = '';
 
     this.registroService.criar(payload).subscribe({
-      next: (response) => {
-        console.log('✅ Registro criado com sucesso:', response);
+      next: () => {
         this.salvando = false;
         this.router.navigate(['/registros'], {
           state: { mensagem: 'Registro meteorológico salvo com sucesso!' }
         });
       },
       error: (err) => {
-        console.error('❌ Erro ao salvar registro:', err);
-        
         let mensagemErro = 'Erro ao salvar o registro.';
         let detalheErro = '';
-        
-        if (err.error) {
-          if (err.error.message) {
-            mensagemErro = err.error.message;
-          }
-          if (err.error.erros) {
-            detalheErro = err.error.erros.join(', ');
-          }
-          if (err.error.campos) {
-            detalheErro = `Campos faltando: ${err.error.campos.join(', ')}`;
-          }
-        } else if (err.message) {
-          detalheErro = err.message;
-        }
-        
+        if (err.error?.message)  mensagemErro = err.error.message;
+        if (err.error?.erros)    detalheErro  = err.error.erros.join(', ');
+        if (err.error?.campos)   detalheErro  = `Campos faltando: ${err.error.campos.join(', ')}`;
+        else if (err.message)    detalheErro  = err.message;
         this.erro = mensagemErro;
         this.erroDetalhe = detalheErro;
         this.salvando = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -158,9 +139,5 @@ export class NovoRegistroComponent implements OnInit {
     this.definirDataHoraAtual();
     this.erro = '';
     this.erroDetalhe = '';
-    
-    if (this.locais.length > 0) {
-      this.registro.local = this.locais[0]._id;
-    }
   }
 }

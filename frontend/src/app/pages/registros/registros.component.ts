@@ -18,7 +18,7 @@ export class RegistrosComponent implements OnInit {
   mensagem = '';
   erro = '';
 
-  filtros: FiltrosRegistro = {};
+  filtros: FiltrosRegistro = { localId: '' };
 
   constructor(
     private registroService: RegistroService,

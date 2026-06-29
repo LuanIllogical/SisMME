@@ -60,26 +60,30 @@ const criarRegistro = async (req, res, next) => {
       });
     }
     
-    // CONSTRUIR OBJETO PARA SALVAR
+    // CONSTRUIR OBJETO PARA SALVAR - SOMENTE CAMPOS DO REGISTRO
     const dadosRegistro = {
-      local: new mongoose.Types.ObjectId(req.body.local),
+      local: req.body.local, // O ObjectId do local
       dataHora: new Date(req.body.dataHora),
       temperatura: Number(req.body.temperatura),
       umidade: Number(req.body.umidade)
     };
     
     // Campos opcionais
-    if (req.body.velocidadeVento !== undefined && req.body.velocidadeVento !== null && req.body.velocidadeVento !== '') {
+    if (req.body.velocidadeVento !== undefined && 
+        req.body.velocidadeVento !== null && 
+        req.body.velocidadeVento !== '') {
       dadosRegistro.velocidadeVento = Number(req.body.velocidadeVento);
     }
     
-    if (req.body.precipitacao !== undefined && req.body.precipitacao !== null && req.body.precipitacao !== '') {
+    if (req.body.precipitacao !== undefined && 
+        req.body.precipitacao !== null && 
+        req.body.precipitacao !== '') {
       dadosRegistro.precipitacao = Number(req.body.precipitacao);
     }
     
     console.log('📦 Dados processados para salvar:', JSON.stringify(dadosRegistro, null, 2));
     
-    // CRIAR REGISTRO
+    // CRIAR REGISTRO - USANDO O MODELO CORRETO
     const registro = new RegistroMeteorologico(dadosRegistro);
     const registroSalvo = await registro.save();
     
